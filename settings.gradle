@@ -1,6 +1,5 @@
 rootProject.name = 'metrics'
-include 'ingestor'
-include 'ingest-api'
-include 'query-api'
+include 'aggregator'
+include 'backend'
 include 'events'
 
