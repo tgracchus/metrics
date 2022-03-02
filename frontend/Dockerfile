@@ -1,0 +1,13 @@
+FROM node:17.6 as builder
+WORKDIR /app
+COPY . .
+RUN npm run build
+
+FROM node:17.6  as availability-test
+WORKDIR /app
+USER node
+
+COPY --chown=node:node --from=builder /app/build /app
+RUN npm install -g serve
+
+CMD ["serve -s build"]

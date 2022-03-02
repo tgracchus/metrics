@@ -1,5 +1,6 @@
 import React from 'react'
 import Timeline from "./timeline";
+import environment from './environment'
 
 class GetMetrics extends React.Component {
     constructor(props) {
@@ -24,7 +25,7 @@ class GetMetrics extends React.Component {
             }
         };
 
-        fetch(`http://127.0.0.1:8080/timeseries?metric=${this.state.metric}&timeRange=${this.state.timerange}&timestamp=${this.state.timestamp}`, requestOptions)
+        fetch(`http://${environment.backend}:8080/timeseries?metric=${this.state.metric}&timeRange=${this.state.timerange}&timestamp=${this.state.timestamp}`, requestOptions)
             .then(response => response.json())
             .then((data) => {
                 this.setState({data: data})

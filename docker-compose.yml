@@ -2,8 +2,8 @@ version: '3.9'
 services:
   backend:
     build:
-      context: .
-      dockerfile: DockerfileBackend
+      context: backend/
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     depends_on:
@@ -13,15 +13,15 @@ services:
       WAIT_HOSTS: kafka:29092, timescaledb:5432
       WAIT_BEFORE: 30
       POSTGRES_HOST: timescaledb
-      KAFKA_HOST: kafka
+      KAFKA_URL: kafka:29092
   frontend:
     build:
-      context: .
-      dockerfile: DockerfileFrontEnd
+      context: frontend/
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      KAFKA_HOST: kafka
+      BACKEND_HOST: backend
   zookeeper:
     image: confluentinc/cp-zookeeper:6.1.4
     environment:
