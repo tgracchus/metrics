@@ -26,7 +26,7 @@ public class QueryEndpoint {
     }
 
     @GetMapping(path = "/timeseries", produces = MediaType.APPLICATION_JSON_VALUE)
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "*")
     public List<Metric> timeseries(@RequestParam("metric") @NotEmpty String metric, @RequestParam("timeRange")TimeRange timeRange, @RequestParam(value = "timestamp", required = false) Long timestamp) {
         if (timestamp == null){
             timestamp = Instant.now().toEpochMilli();

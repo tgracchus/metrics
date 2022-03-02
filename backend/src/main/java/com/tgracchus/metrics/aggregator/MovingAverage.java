@@ -3,8 +3,6 @@ package com.tgracchus.metrics.aggregator;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.math.BigDecimal;
-
 public class MovingAverage {
     private final String key;
     private final Long timestamp;
