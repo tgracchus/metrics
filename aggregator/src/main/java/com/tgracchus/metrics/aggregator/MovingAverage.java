@@ -10,14 +10,14 @@ public class MovingAverage {
     private final Long timestamp;
     private final String metric;
     private final Integer count;
-    private final BigDecimal value;
+    private final Double value;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public MovingAverage(@JsonProperty("key")String key,
                          @JsonProperty("timestamp") Long timestamp,
                          @JsonProperty("metric") String metric,
                          @JsonProperty("count") Integer count,
-                         @JsonProperty("value") BigDecimal value) {
+                         @JsonProperty("value") Double value) {
         this.key = key;
         this.timestamp = timestamp;
         this.metric = metric;
@@ -29,7 +29,7 @@ public class MovingAverage {
         return count;
     }
 
-    public BigDecimal getValue() {
+    public Double getValue() {
         return value;
     }
 

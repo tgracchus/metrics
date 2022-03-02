@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -39,7 +40,7 @@ public class MetricsAggregator {
                 .map((key, value) -> {
                     long timestampPerMinute = Instant.ofEpochMilli(value.getTimestamp()).truncatedTo(ChronoUnit.MINUTES).toEpochMilli();
                     String newKeyPerMinute = value.getMetric() + timestampPerMinute;
-                    return new KeyValue<>(key, new MovingAverage(newKeyPerMinute, timestampPerMinute, value.getMetric(), 1, new BigDecimal(value.getValue())));
+                    return new KeyValue<>(key, new MovingAverage(newKeyPerMinute, timestampPerMinute, value.getMetric(), 1, value.getValue()));
                 })
                 .groupByKey()
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(timeDifference))
@@ -47,10 +48,13 @@ public class MetricsAggregator {
                         new Reducer<MovingAverage>() {
                             @Override
                             public MovingAverage apply(MovingAverage value1, MovingAverage value2) {
+                                BigDecimal val1 = new BigDecimal(value1.getValue());
+                                BigDecimal val2 = new BigDecimal(value2.getValue());
+                                BigDecimal sum = val1.add(val2);
                                 return new MovingAverage(
                                         value2.getKey(), value2.getTimestamp(), value2.getMetric(),
                                         value1.getCount() + value2.getCount(),
-                                        value1.getValue().add(value2.getValue()));
+                                        sum.doubleValue());
                             }
                         }, Materialized.with(stringSerde, movingAverageSerde));
 
@@ -58,7 +62,9 @@ public class MetricsAggregator {
                 .mapValues(new ValueMapper<MovingAverage, MetricEvent>() {
                     @Override
                     public MetricEvent apply(MovingAverage value) {
-                        return new MetricEvent(value.getMetric(), value.getValue().divide(new BigDecimal(value.getCount())).doubleValue(), value.getTimestamp());
+                        BigDecimal val = new BigDecimal(value.getValue());
+                        BigDecimal division = val.divide(new BigDecimal(value.getCount()), RoundingMode.HALF_DOWN);
+                        return new MetricEvent(value.getMetric(), division.doubleValue(), value.getTimestamp());
                     }
                 })
                 .toStream()
