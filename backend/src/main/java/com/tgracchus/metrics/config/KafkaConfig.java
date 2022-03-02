@@ -31,7 +31,6 @@ import java.util.Map;
 
 @Configuration
 @EnableKafkaStreams
-@EnableKafka
 public class KafkaConfig {
 
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
@@ -97,10 +96,17 @@ public class KafkaConfig {
         return new KafkaTemplate<>(producerFactory);
     }
 
+    @Bean
+    public KafkaAdmin kafkaAdmin(KafkaProperties kafkaProperties) {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
+        KafkaAdmin admin = new KafkaAdmin(configs);
+        admin.setAutoCreate(false);
+        return admin;
+    }
 
     @Bean
-    public NewTopic ingestTopic(KafkaAdmin admin) {
-        admin.setAutoCreate(false);
+    public NewTopic ingestTopic() {
         return new NewTopic("ingest", 1, (short) 1);
     }
 }
