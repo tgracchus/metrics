@@ -8,6 +8,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class KafkaIngestService implements IngestService {
@@ -21,12 +22,14 @@ public class KafkaIngestService implements IngestService {
         this.topic = topic.name();
     }
 
-
     @Override
     public void ingest(IngestRequest ingestRequest) {
-        long timestamp = Instant.now().toEpochMilli();
-        ingestRequest.getMetrics().forEach(
-                metricDto -> kafkaTemplate.send(topic, null, timestamp, metricDto.getKey(), new MetricEvent(metricDto.getValue(), timestamp)));
+        ingestRequest.getMetrics().forEach(metric -> {
+            metric.getPoints().forEach(ingestPoint -> {
+                MetricEvent event = new MetricEvent(metric.getMetric(), ingestPoint.getValue(), ingestPoint.getTimestamp());
+                kafkaTemplate.send(topic, null, ingestPoint.getTimestamp(), event.getMetric(), event);
+            });
 
+        });
     }
 }

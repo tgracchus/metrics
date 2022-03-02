@@ -1,19 +1,24 @@
-package com.tgracchus.metrics;
+package com.tgracchus.metrics.aggregator;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
+
 public class MovingAverage {
+    private final String key;
     private final Long timestamp;
     private final String metric;
     private final Integer count;
-    private final Double value;
+    private final BigDecimal value;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public MovingAverage(@JsonProperty("timestamp") Long timestamp,
+    public MovingAverage(@JsonProperty("key")String key,
+                         @JsonProperty("timestamp") Long timestamp,
                          @JsonProperty("metric") String metric,
                          @JsonProperty("count") Integer count,
-                         @JsonProperty("value") Double value) {
+                         @JsonProperty("value") BigDecimal value) {
+        this.key = key;
         this.timestamp = timestamp;
         this.metric = metric;
         this.count = count;
@@ -24,7 +29,7 @@ public class MovingAverage {
         return count;
     }
 
-    public Double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
@@ -34,5 +39,9 @@ public class MovingAverage {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public String getKey() {
+        return key;
     }
 }

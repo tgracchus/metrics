@@ -3,23 +3,25 @@ package com.tgracchus.metrics.endpoints.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 public class IngestMetric {
-    private final String key;
-    private final Double value;
+    private final String metric;
+    private final List<IngestPoint> points;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public IngestMetric(@JsonProperty("key") String key,
-                        @JsonProperty("value") Double value
+    public IngestMetric(@JsonProperty("key") String metric,
+                        @JsonProperty("points") List<IngestPoint> points
     ) {
-        this.key = key;
-        this.value = value;
+        this.metric = metric;
+        this.points = points;
     }
 
-    public String getKey() {
-        return key;
+    public String getMetric() {
+        return metric;
     }
 
-    public Double getValue() {
-        return value;
+    public List<IngestPoint> getPoints() {
+        return points;
     }
 }

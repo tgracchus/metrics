@@ -1,4 +1,4 @@
-package com.tgracchus.metrics;
+package com.tgracchus.metrics.aggregator;
 
 public class InsertResult {
 

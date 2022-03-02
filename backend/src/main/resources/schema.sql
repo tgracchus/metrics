@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS metrics (
                                                time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
                                                key text NULL,
                                                value float8 NULL,
-                                               PRIMARY KEY(time, key)
+                                               PRIMARY KEY(key, time)
 );
 
 -- Step 2: Turn into hypertable
