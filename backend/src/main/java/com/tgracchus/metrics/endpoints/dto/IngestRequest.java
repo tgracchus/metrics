@@ -1,20 +1,15 @@
 package com.tgracchus.metrics.endpoints.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
+@Data
 public class IngestRequest {
 
-    private final List<IngestMetric> metrics;
-
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public IngestRequest(@JsonProperty("metrics") List<IngestMetric> metrics) {
-        this.metrics = metrics;
-    }
-
-    public List<IngestMetric> getMetrics() {
-        return metrics;
-    }
+    @NotEmpty
+    @Valid
+    private List<IngestMetric> metrics;
 }

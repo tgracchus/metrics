@@ -2,26 +2,20 @@ package com.tgracchus.metrics.endpoints.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
+@Data
 
 public class IngestMetric {
-    private final String metric;
-    private final List<IngestPoint> points;
+    @NotBlank
+    private String metric;
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public IngestMetric(@JsonProperty("key") String metric,
-                        @JsonProperty("points") List<IngestPoint> points
-    ) {
-        this.metric = metric;
-        this.points = points;
-    }
+    @NotEmpty
+    @Valid
+    private List<IngestPoint> points;
 
-    public String getMetric() {
-        return metric;
-    }
-
-    public List<IngestPoint> getPoints() {
-        return points;
-    }
 }

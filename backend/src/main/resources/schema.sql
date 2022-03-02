@@ -3,7 +3,7 @@
 ----------------------------------------
 -- Step 1: Define regular table
 CREATE TABLE IF NOT EXISTS metrics (
-                                               time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+                                               time timestamptz NOT NULL,
                                                key text NULL,
                                                value float8 NULL,
                                                PRIMARY KEY(key, time)

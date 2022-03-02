@@ -1,6 +1,5 @@
 package com.tgracchus.metrics.endpoints;
 
-import com.tgracchus.metrics.endpoints.dto.IngestMetric;
 import com.tgracchus.metrics.endpoints.dto.Metric;
 import com.tgracchus.metrics.endpoints.dto.TimeRange;
 import com.tgracchus.metrics.services.MetricsService;
@@ -11,6 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -25,7 +27,10 @@ public class QueryEndpoint {
 
     @GetMapping(path = "/timeseries", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin(origins = "http://localhost:3000")
-    public List<Metric> timeseries(@RequestParam("metric") String key, @RequestParam("timeRange")TimeRange timeRange) {
-        return metricsService.getMetricsByKeyAndTimeRange(key,timeRange);
+    public List<Metric> timeseries(@RequestParam("metric") @NotEmpty String metric, @RequestParam("timeRange")TimeRange timeRange, @RequestParam(value = "timestamp", required = false) Long timestamp) {
+        if (timestamp == null){
+            timestamp = Instant.now().toEpochMilli();
+        }
+        return metricsService.getMetricsByKeyAndTimeRange(metric, timeRange, timestamp);
     }
 }

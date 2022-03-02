@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
 
@@ -20,9 +21,9 @@ public class TimescaleDBSink implements Sink<Windowed<String>, MetricEvent> {
     @Override
     public InsertResult insert(Windowed<String> key, MetricEvent metricEvent) {
         Instant timestamp = Instant.ofEpochMilli(metricEvent.getTimestamp());
-        LocalDateTime localTime = LocalDateTime.ofInstant(timestamp, ZoneId.of("UTC"));
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestamp, ZoneId.of("UTC"));
         String insertQuery = "insert into metrics values(?,?,?) ON CONFLICT (key,time) DO UPDATE SET value=?";
-        int updated = jdbcTemplate.update(insertQuery, localTime, key.key(), metricEvent.getValue(),metricEvent.getValue());
+        int updated = jdbcTemplate.update(insertQuery, localTime, metricEvent.getMetric(), metricEvent.getValue(),metricEvent.getValue());
         return new InsertResult(updated);
     }
 

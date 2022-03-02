@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,20 +30,22 @@ public class TimescaleDBMetricsService implements MetricsService {
     }
 
     @Override
-    public List<Metric> getMetricsByKeyAndTimeRange(String key, TimeRange timeRange) {
+    public List<Metric> getMetricsByKeyAndTimeRange(String key, TimeRange timeRange, Long timestamp) {
+        Instant timestampInstant = Instant.ofEpochMilli(timestamp);
+        OffsetDateTime localTime = OffsetDateTime.ofInstant(timestampInstant, ZoneId.of("UTC"));
         switch (timeRange){
             case LAST_15M: {
-                String query = "SELECT time as timestamp,key,value FROM metrics WHERE key=? AND time > NOW() at time zone 'utc' - INTERVAL '15 minutes' ORDER BY timestamp DESC";
-                return jdbcTemplate.query(query, this.rowMapper, key);
+                String query = "SELECT time as timestamp,key,value FROM metrics WHERE key=? AND time>? at time zone 'utc' - INTERVAL '15 minutes' ORDER BY timestamp DESC";
+                return jdbcTemplate.query(query, this.rowMapper, key, localTime);
             }
             case LAST_HOUR: {
-                String query = "SELECT time as timestamp ,key,value FROM metrics WHERE key=? AND time > NOW() at time zone 'utc' - INTERVAL '1 hour' ORDER BY timestamp DESC";
-                return jdbcTemplate.query(query, this.rowMapper, key);
+                String query = "SELECT time as timestamp,key,value FROM metrics WHERE key=? AND time>? at time zone 'utc' - INTERVAL '1 hour' ORDER BY timestamp DESC";
+                return jdbcTemplate.query(query, this.rowMapper, key, localTime);
             }
             case LAST_DAY: {
                 String query = "SELECT time_bucket('1 hour', time) as timestamp, key, avg(value) as value FROM metrics " +
-                        "WHERE key = ? AND time > now() - interval '1' day GROUP BY key, timestamp ORDER BY key, timestamp DESC;";
-                return jdbcTemplate.query(query, this.rowMapper, key);
+                        "WHERE key = ? AND time > ? - interval '1' day GROUP BY key, timestamp ORDER BY key, timestamp DESC;";
+                return jdbcTemplate.query(query, this.rowMapper, key, localTime);
             }
         }
         return new ArrayList<>();

@@ -1,25 +1,19 @@
 package com.tgracchus.metrics.endpoints.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+@Data
 public class IngestPoint {
-    private final Long timestamp;
-    private final Double value;
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public IngestPoint(@JsonProperty("timestamp") Long timestamp,
-                       @JsonProperty("value") Double value
-    ) {
-        this.timestamp = timestamp;
-        this.value = value;
-    }
+    @NotNull
+    private Long timestamp;
 
-    public Long getTimestamp() {
-        return timestamp;
-    }
+    @NotNull
+    private Double value;
 
-    public Double getValue() {
-        return value;
-    }
+
 }
