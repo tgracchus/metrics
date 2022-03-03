@@ -11,10 +11,21 @@ services:
       - timescaledb
     environment:
       WAIT_HOSTS: kafka:9092, timescaledb:5432
-      WAIT_BEFORE: 20
+      WAIT_BEFORE: 15
       POSTGRES_HOST: timescaledb
       KAFKA_URL: kafka:9092
-  
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      BACKEND_HOST: backend
+      WAIT_HOSTS: kafka:9092, timescaledb:5432, backend:8080
+      WAIT_BEFORE: 25
   zookeeper:
     image: confluentinc/cp-zookeeper:6.1.4
     environment:

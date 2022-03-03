@@ -22,7 +22,7 @@ class PostMetrics extends React.Component {
         const body = JSON.stringify({
             "metrics": [
                 {
-                    "key": `${this.state.metric}`,
+                    "metric": `${this.state.metric}`,
                     "points": [
                         {
                             "timestamp": `${this.state.timestamp}`,

@@ -16,8 +16,14 @@ class App extends Component {
                 <header className="App-header">
                     Metrics frontend
                 </header>
+                <div className="App-title">
+                    Get Metrics
+                </div>
                 <div>
                     <GetMetrics/>
+                </div>
+                <div className="App-title">
+                    Post Metrics
                 </div>
                 <div>
                     <PostMetrics/>
