@@ -4,7 +4,7 @@ import environment from './environment'
 class PostMetrics extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {metric: '', timestamp: '', value: '', data: []};
+        this.state = {metric: '', timestamp: '', value: '', data: [], error:undefined};
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -43,13 +43,19 @@ class PostMetrics extends React.Component {
 
 
         fetch(`http://${environment.backend}:8080/ingest`, requestOptions)
-            .then(response => response.json())
-            .catch(error => {
-                alert(error)
-                console.log('error', error)
+            .then(response => {
+                if(!response.ok){
+                    return response.text().then(text => { throw new Error(text) })
+                }
+                return response.json()
             })
             .then((data) => {
+                this.setState({error:undefined})
                 console.log('data', data)
+            })
+            .catch(error => {
+                this.setState({error:error.toString()})
+                console.log('error', error)
             });
     }
 
@@ -73,6 +79,7 @@ class PostMetrics extends React.Component {
                                    onChange={this.handleChange}/>
                         </label>
                         <input type="submit" value="Submit"/>
+                        {this.state.error && <div className="App-error"> {this.state.error} </div>}
                     </form>
                 </div>
             </div>

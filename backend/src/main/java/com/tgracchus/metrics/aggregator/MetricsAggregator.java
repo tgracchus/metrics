@@ -10,6 +10,7 @@ import org.apache.kafka.streams.kstream.Initializer;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.kstream.SlidingWindows;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.ValueMapper;
 import org.apache.kafka.streams.kstream.Windowed;
@@ -33,35 +34,19 @@ public class MetricsAggregator {
                        Serde<MovingAverage> movingAverageSerde,
                        Sink<Windowed<String>, MetricEvent> metricEventSink) {
 
-        Duration timeDifference = Duration.ofMinutes(15);
+        Duration timeDifference = Duration.ofMinutes(10);
+        Duration gradePeriod = Duration.ofMinutes(60);
         KStream<String, MetricEvent> messageStream = streamsBuilder
                 .stream("ingest", Consumed.with(stringSerde, metricEventSerde));
 
-        /*
-           .map((key, value) -> {
-                    long timestampPerMinute = Instant.ofEpochMilli(value.getTimestamp()).truncatedTo(ChronoUnit.MINUTES).toEpochMilli();
-                    String newKeyPerMinute = value.getMetric() + timestampPerMinute;
-                    return new KeyValue<>(key, new MovingAverage(newKeyPerMinute, timestampPerMinute, value.getMetric(), 0, value.getValue()));
-                })
-
-                    BigDecimal val1 = new BigDecimal(value1.getValue());
-                        BigDecimal val2 = new BigDecimal(value2.getValue());
-                        BigDecimal sum = val1.add(val2);
-                        return new MovingAverage(
-                                value2.getKey(), value2.getTimestamp(), value2.getMetric(),
-                                value1.getCount() + 1,
-                                sum.doubleValue());
-                    }
-         */
-
         KTable<Windowed<String>, MovingAverage> averages_1m = messageStream
                 .map((key, value) -> {
-                    long timestampPerMinute = Instant.ofEpochMilli(value.getTimestamp()).truncatedTo(ChronoUnit.MINUTES).toEpochMilli();
-                    String newKeyPerMinute = value.getMetric() + timestampPerMinute;
-                    return new KeyValue<>(newKeyPerMinute, value);
+                    long timestampPerSecond = Instant.ofEpochMilli(value.getTimestamp()).truncatedTo(ChronoUnit.SECONDS).toEpochMilli();
+                    String newKeyPerSecond = value.getMetric() + timestampPerSecond;
+                    return new KeyValue<>(newKeyPerSecond, value);
                 })
                 .groupByKey()
-                .windowedBy(TimeWindows.ofSizeWithNoGrace(timeDifference))
+                .windowedBy(SlidingWindows.ofTimeDifferenceAndGrace(timeDifference,gradePeriod))
                 .aggregate(new Initializer<MovingAverage>() {
                     @Override
                     public MovingAverage apply() {

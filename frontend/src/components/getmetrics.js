@@ -5,10 +5,11 @@ import environment from './environment'
 class GetMetrics extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {metric: '', timestamp: '', timerange: 'LAST_15M', data: []};
+        this.state = {metric: '', timestamp: '', timerange: 'LAST_15M', data: [], error: undefined};
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
+
 
     handleChange(event) {
         this.setState({[event.target.id]: event.target.value});
@@ -26,14 +27,21 @@ class GetMetrics extends React.Component {
         };
 
         fetch(`http://${environment.backend}:8080/timeseries?metric=${this.state.metric}&timeRange=${this.state.timerange}&timestamp=${this.state.timestamp}`, requestOptions)
-            .then(response => response.json())
-            .catch(error => {
-                alert(error)
-                console.log('error', error)
+            .then(response => {
+                if(!response.ok){
+                    return response.text().then(text => { throw new Error(text) })
+                }
+                return response.json()
             })
             .then((data) => {
+                this.setState({error: undefined})
                 this.setState({data: data})
+            })
+            .catch(error => {
+                this.setState({error: error.toString()})
+                console.log('error', error)
             });
+
     }
 
     render() {
@@ -59,6 +67,7 @@ class GetMetrics extends React.Component {
                                 <option value="LAST_DAY">Last Day</option>
                             </select>
                             <input type="submit" value="Submit"/>
+                            {this.state.error && <div className="App-error"> {this.state.error} </div>}
                         </label>
                     </form>
                 </div>

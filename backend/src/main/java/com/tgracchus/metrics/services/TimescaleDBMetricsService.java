@@ -35,16 +35,17 @@ public class TimescaleDBMetricsService implements MetricsService {
         OffsetDateTime localTime = OffsetDateTime.ofInstant(timestampInstant, ZoneId.of("UTC"));
         switch (timeRange){
             case LAST_15M: {
-                String query = "SELECT time as timestamp,key,value FROM metrics WHERE key=? AND time>? at time zone 'utc' - INTERVAL '15 minutes' ORDER BY timestamp DESC";
+                String query = "SELECT time as timestamp,key,value FROM metrics WHERE key=? AND time>? at time zone 'utc' - INTERVAL '15 minutes' ORDER BY timestamp ASC";
                 return jdbcTemplate.query(query, this.rowMapper, key, localTime);
             }
             case LAST_HOUR: {
-                String query = "SELECT time as timestamp,key,value FROM metrics WHERE key=? AND time>? at time zone 'utc' - INTERVAL '1 hour' ORDER BY timestamp DESC";
+                String query = "SELECT time_bucket('1 min', time) as timestamp, key, avg(value) as value FROM metrics " +
+                        "WHERE key = ? AND time > ? - interval '1' day GROUP BY key, timestamp ORDER BY key, timestamp ASC;";
                 return jdbcTemplate.query(query, this.rowMapper, key, localTime);
             }
             case LAST_DAY: {
                 String query = "SELECT time_bucket('1 hour', time) as timestamp, key, avg(value) as value FROM metrics " +
-                        "WHERE key = ? AND time > ? - interval '1' day GROUP BY key, timestamp ORDER BY key, timestamp DESC;";
+                        "WHERE key = ? AND time > ? - interval '1' day GROUP BY key, timestamp ORDER BY key, timestamp ASC;";
                 return jdbcTemplate.query(query, this.rowMapper, key, localTime);
             }
         }

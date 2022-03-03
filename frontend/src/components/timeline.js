@@ -16,7 +16,7 @@ const Timeline = ({ metrics }) => {
         >
             <CartesianGrid strokeDasharray="3 3"/>
             <XAxis dataKey="key"/>
-            <YAxis/>
+            <YAxis dataKey="timestamp"/>
             <Tooltip/>
             <Legend/>
             <Line
