@@ -1,4 +1,4 @@
-package com.tgracchus.metrics.aggregator;
+package com.tgracchus.metrics.aggregator.kafka;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

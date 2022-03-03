@@ -28,12 +28,20 @@ class GetMetrics extends React.Component {
 
         fetch(`http://${environment.backend}:8080/timeseries?metric=${this.state.metric}&timeRange=${this.state.timerange}&timestamp=${this.state.timestamp}`, requestOptions)
             .then(response => {
-                if(!response.ok){
-                    return response.text().then(text => { throw new Error(text) })
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text)
+                    })
                 }
                 return response.json()
             })
-            .then((data) => {
+            .then(data => {
+                data.points.forEach(point => {
+                    point["timestamp"] = new Date(point.timestamp).toLocaleString()
+                })
+                return data
+            })
+            .then(data => {
                 this.setState({error: undefined})
                 this.setState({data: data})
             })
@@ -48,7 +56,7 @@ class GetMetrics extends React.Component {
         return (
             <div>
                 <div>
-                    <form onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.handleSubmit} >
                         <label>
                             Metric Name:
                             <input id="metric" type="text" value={this.state.metric} onChange={this.handleChange}/>

@@ -8,8 +8,8 @@ The app flow is as follows:
 - An ingest rest endpoint pushes the raw data to a kafka topic.
 
 
-- A kakfa streams app which aggregates the metrics points for every minute and inserts the points aggregated per minute into timescaledb.
-It works in windows of 15m, that means that metric timestamps needs to be into that 15 minutes , otherwise metrics are discarded. In other words, you can not send events to the past.
+- A kakfa streams app which aggregates the metrics group by second with a sliding windows of 15m with a grace period of 1 hour:  
+That means that events are agrregated per second and can send events "late" up to one hour.
 
 
 - A query endpoint queries the timescaledb for fetching the points for the last 15m, last hour or last day.
@@ -31,18 +31,49 @@ Refer to [https://www.epochconverter.com/](https://www.epochconverter.com/) if y
 curl --location --request POST 'localhost:8080/ingest' \
 --header 'Content-Type: application/json' \
 --data-raw '{"metrics":[
-    {"metric":"cpu1","points":[{"timestamp":"1646221951000","value":"1.9"},{"timestamp":"1646221951000","value":"1.1"},{"timestamp":"1646222071000","value":"1.1"}  ]},
-    {"metric":"men1","points":[{"timestamp":"1646221951000","value":"2.9"},{"timestamp":"1646221951000","value":"1.1"} ,{"timestamp":"1646222071000","value":"1.1"} ]},
-    {"metric":"men2","points":[{"timestamp":"1646221951000","value":"5.9"},{"timestamp":"1646221951000","value":"1.1"},{"timestamp":"1646222071000","value":"1.1"}  ]},
-    {"metric":"cpu2","points":[{"timestamp":"1646221951000","value":"9.9"},{"timestamp":"1646221951000","value":"1.1"} ,{"timestamp":"1646222071000","value":"1.1"} ]}
+    {"metric":"cpu1","points":[{"timestamp":"1646221951000","value":"1.9"},{"timestamp":"1646221961000","value":"1.1"},{"timestamp":"1646222071000","value":"1.1"}  ]},
+    {"metric":"men1","points":[{"timestamp":"1646221951000","value":"2.9"},{"timestamp":"1646221961000","value":"1.1"} ,{"timestamp":"1646222071000","value":"1.1"} ]},
+    {"metric":"men2","points":[{"timestamp":"1646221951000","value":"5.9"},{"timestamp":"1646221961000","value":"1.1"},{"timestamp":"1646222071000","value":"1.1"}  ]},
+    {"metric":"cpu2","points":[{"timestamp":"1646221951000","value":"9.9"},{"timestamp":"1646221961000","value":"1.1"} ,{"timestamp":"1646222071000","value":"1.1"} ]}
 ]}'
+```
+
+Response:
+```json
+{
+    "result": "ok"
+}
 ```
 
 ### Query api
 ```bash
-curl --location --request GET 'http://127.0.0.1:8080/timeseries?metric=cpu1&timeRange=LAST_15M&timestamp=1646223951000'
+curl --location --request GET 'http://127.0.0.1:8080/timeseries?metric=cpu2&timeRange=LAST_15M&timestamp=1646222071000'
 ```
+timeRange can be: LAST_15M, LAST_HOUR, LAST_DAY:  
+- LAST_15M will return the raw points per second. So, expect up to 900 points  
+- LAST_HOUR will return the points aggregated per minute: so, expect up to 60 points
+- LAST_DAY will return the points aggregated per 30 minutes: so, expect up to 48 points
 
+Response
+````json
+{
+    "metric": "cpu2",
+    "timestamp": [
+        {
+            "timestamp": 1646221951000,
+            "value": 7.0
+        },
+        {
+            "timestamp": 1646221961000,
+            "value": 1.1
+        },
+        {
+            "timestamp": 1646222071000,
+            "value": 1.1
+        }
+    ]
+}
+````
 
 ## Build and run
 To build, execute

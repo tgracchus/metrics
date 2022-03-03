@@ -1,6 +1,7 @@
 package com.tgracchus.metrics.endpoints;
 
 import com.tgracchus.metrics.endpoints.dto.Metric;
+import com.tgracchus.metrics.endpoints.dto.MetricPoints;
 import com.tgracchus.metrics.endpoints.dto.TimeRange;
 import com.tgracchus.metrics.services.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class QueryEndpoint {
 
     @GetMapping(path = "/timeseries", produces = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin(origins = "*")
-    public List<Metric> timeseries(@RequestParam("metric") @NotEmpty String metric, @RequestParam("timeRange")TimeRange timeRange, @RequestParam(value = "timestamp", required = false) Long timestamp) {
+    public MetricPoints timeseries(@RequestParam("metric") @NotEmpty String metric, @RequestParam("timeRange")TimeRange timeRange, @RequestParam(value = "timestamp", required = false) Long timestamp) {
         if (timestamp == null){
             timestamp = Instant.now().toEpochMilli();
         }

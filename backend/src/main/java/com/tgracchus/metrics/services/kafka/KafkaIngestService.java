@@ -1,7 +1,8 @@
-package com.tgracchus.metrics.services;
+package com.tgracchus.metrics.services.kafka;
 
 import com.tgracchus.metrics.endpoints.dto.IngestRequest;
 import com.tgracchus.metrics.events.MetricEvent;
+import com.tgracchus.metrics.services.IngestService;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

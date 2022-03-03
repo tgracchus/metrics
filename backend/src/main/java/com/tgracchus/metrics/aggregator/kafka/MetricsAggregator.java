@@ -1,5 +1,6 @@
-package com.tgracchus.metrics.aggregator;
+package com.tgracchus.metrics.aggregator.kafka;
 
+import com.tgracchus.metrics.aggregator.Sink;
 import com.tgracchus.metrics.events.MetricEvent;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.streams.KeyValue;
@@ -11,7 +12,6 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.SlidingWindows;
-import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.ValueMapper;
 import org.apache.kafka.streams.kstream.Windowed;
 import org.springframework.beans.factory.annotation.Autowired;
