@@ -10,10 +10,10 @@ services:
       - kafka
       - timescaledb
     environment:
-      WAIT_HOSTS: kafka:29092, timescaledb:5432
+      WAIT_HOSTS: kafka:9092, timescaledb:5432
       WAIT_BEFORE: 20
       POSTGRES_HOST: timescaledb
-      KAFKA_URL: kafka:29092
+      KAFKA_URL: kafka:9092
   
   zookeeper:
     image: confluentinc/cp-zookeeper:6.1.4
@@ -28,6 +28,7 @@ services:
       - zookeeper
     ports:
       - "29092:29092"
+      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181

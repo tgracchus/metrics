@@ -14,4 +14,4 @@ ENV KAFKA_URL="kafka:29092"
 ENV POSTGRES_HOST="timescaledb"
 
 
-CMD ["./entrypoint.sh"]
+CMD ["/app/entrypoint.sh"]

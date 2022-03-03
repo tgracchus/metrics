@@ -39,7 +39,6 @@ public class KafkaConfig {
     }
 
 
-
     @Bean
     public Serde<MetricEvent> metricEventSerde(KafkaProperties kafkaProperties) {
         Serde<MetricEvent> metricEventSerde = new JsonSerde<>(MetricEvent.class);
@@ -101,7 +100,6 @@ public class KafkaConfig {
         Map<String, Object> configs = new HashMap<>();
         configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         KafkaAdmin admin = new KafkaAdmin(configs);
-        admin.setAutoCreate(false);
         return admin;
     }
 
