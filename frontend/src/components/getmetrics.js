@@ -27,11 +27,13 @@ class GetMetrics extends React.Component {
 
         fetch(`http://${environment.backend}:8080/timeseries?metric=${this.state.metric}&timeRange=${this.state.timerange}&timestamp=${this.state.timestamp}`, requestOptions)
             .then(response => response.json())
+            .catch(error => {
+                alert(error)
+                console.log('error', error)
+            })
             .then((data) => {
                 this.setState({data: data})
-            })
-            .catch(error => console.log('error', error));
-
+            });
     }
 
     render() {

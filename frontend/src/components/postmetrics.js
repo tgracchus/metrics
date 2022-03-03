@@ -44,12 +44,12 @@ class PostMetrics extends React.Component {
 
         fetch(`http://${environment.backend}:8080/ingest`, requestOptions)
             .then(response => response.json())
-            .then((data) => {
-                console.log('data', data)
-            })
             .catch(error => {
                 alert(error)
                 console.log('error', error)
+            })
+            .then((data) => {
+                console.log('data', data)
             });
     }
 
